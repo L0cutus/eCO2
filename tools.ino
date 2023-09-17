@@ -42,12 +42,7 @@ void drawDisplay(void) {
   display.print(humidity);
   display.println(F("%"));
 
-  // display.setTextColor(SSD1306_WHITE); // Draw 'inverse' text
-  // display.print(F("P:"));
-  // display.print(pressure / 100.0F);
-  // display.println(F("C"));
-
-   if (preheatSec > 0) {
+  if (preheatSec > 0) {
     display.setTextSize(2);    
     display.print("PREHEAT");
     display.print(preheatSec);  
@@ -108,4 +103,16 @@ void displayPPM(long ppm) {
   Serial.println(ppm);  
 }
 
-
+void blinkRgbLed(RGB col){
+  for(int i=0;i<=3; i++)
+  {
+    WiFiDrv::analogWrite(RED, col.red);   //RED
+    WiFiDrv::analogWrite(GREEN, col.green); //GREEN
+    WiFiDrv::analogWrite(BLUE, col.blue);   //BLUE
+    delay(100);
+    WiFiDrv::analogWrite(RED, 0);   //RED
+    WiFiDrv::analogWrite(GREEN, 0); //GREEN
+    WiFiDrv::analogWrite(BLUE, 0);   //BLUE
+    delay(100);
+  }
+}

@@ -37,6 +37,13 @@ int preheatSec = 120;
 int prevVal = LOW;
 long th, tl, h, l, ppm = 0;
 
+struct RGB {
+  byte red;
+  byte green;
+  byte blue;
+};
+
+RGB colors = {0, 255, 0};
 
 Adafruit_SGP30 sgp;
 Adafruit_BME280 bme; // I2C
@@ -61,7 +68,6 @@ uint32_t getAbsoluteHumidity(float temperature, float humidity) {
 
 void setup() {
   Serial.begin(115200);
-  //while (!Serial) { delay(10); } // Wait for serial console to open!
   
   setupBME();
   
@@ -101,10 +107,7 @@ void loop() {
   // If you have a temperature / humidity sensor, you can set the absolute humidity to enable the humditiy compensation for the air quality signals
   temperature = bme.readTemperature();
   humidity = bme.readHumidity();
-  //pressure = bme.readPressure();
 
-  //float temperature = 22.1; // [°C]
-  //float humidity = 45.2; // [%RH]
   sgp.setHumidity(getAbsoluteHumidity(temperature, humidity));
 
   if (! sgp.IAQmeasure()) {
@@ -117,22 +120,11 @@ void loop() {
   Serial.print("TVOC "); Serial.print( TVOC ) ; Serial.print(" ppb\t");
   Serial.print("eCO2 "); Serial.print(eCO2); Serial.println(" ppm");
 
-  if( eCO2 >= 400 && eCO2 <= 1000 )
-  {
-    WiFiDrv::analogWrite(RED, 0);   //RED
-    WiFiDrv::analogWrite(GREEN, 32); //GREEN
-    WiFiDrv::analogWrite(BLUE, 0);   //BLUE
-  }
-  else if( eCO2 > 1000 && eCO2 <= 2000 )
-  {
-    WiFiDrv::analogWrite(RED, 32);   //RED
-    WiFiDrv::analogWrite(GREEN, 32); //GREEN
-    WiFiDrv::analogWrite(BLUE, 0);   //BLUE
-  } else if( eCO2 > 2000 && eCO2 <= 5000 )
-  {
-    WiFiDrv::analogWrite(RED, 32);   //RED
-    WiFiDrv::analogWrite(GREEN, 0); //GREEN
-    WiFiDrv::analogWrite(BLUE, 0);   //BLUE
+  if (preheatSec <= 0){
+    if( ppm > 1000 && ppm <= 2000 )
+      blinkRgbLed({32, 32, 0}); // {32, 32, 0}
+    else if( ppm > 2000 && ppm <= 5000 )
+      blinkRgbLed({32, 0, 0}); // {32, 0, 0}
   }
 
   if (! sgp.IAQmeasureRaw()) {
@@ -143,7 +135,6 @@ void loop() {
   Serial.print("Raw Ethanol "); Serial.print(sgp.rawEthanol); Serial.println("");
   Serial.print("Temp.: "); Serial.print(temperature); Serial.print("\t");
   Serial.print("Hum.: "); Serial.print(humidity); Serial.println("");
-  // Serial.print("Pres.: "); Serial.println(pressure / 100.0F);
 
   counter++;
   if (counter == 60) {
