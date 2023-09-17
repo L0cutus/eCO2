@@ -121,9 +121,9 @@ void loop() {
   Serial.print("eCO2 "); Serial.print(eCO2); Serial.println(" ppm");
 
   if (preheatSec <= 0){
-    if( ppm > 1000 && ppm <= 2000 )
+    if( ppm > 500 && ppm <= 1000 )
       blinkRgbLed({32, 32, 0}); // {32, 32, 0}
-    else if( ppm > 2000 && ppm <= 5000 )
+    else if( ppm > 1000 && ppm <= 2000 )
       blinkRgbLed({32, 0, 0}); // {32, 0, 0}
   }
 
